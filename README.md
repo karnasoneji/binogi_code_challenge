@@ -5,7 +5,7 @@ The task is split into several sub-categories and shouldn't take longer than 2-4
 
 ### Restrictions and Requirements
 1. This challenge requires Docker to be installed on your system. The easiest way to accomplish this is to [install Docker Desktop](https://www.docker.com/).
-2. You should focus on code quality and structure. If possible, timely, and reasonable, also add tests.
+2. You should focus on code quality and structure.
 3. Wherever possible, try to follow the [SOLID principles](https://en.wikipedia.org/wiki/SOLID).
 
 ### Setup
@@ -27,6 +27,10 @@ The assignment is to add a column named `nickname` (via a migration) to the data
    - A valid nickname must be shorter than 30 characters.
 3. Documentation should be updated so Swagger can be generated and used to smoke test.
    - We are using the open-source package [L5-Swagger](https://github.com/DarkaOnLine/L5-Swagger) to generate OpenAPI Swagger.
+4. Tests
+   - Integration and Acceptance tests should be updated to reflect your changes
+   - Tests should be added to assert that your changes function as expected
+   - Tests should be added to assert that given "bad" cases will fail (assert failures)
 
 ### Submitting Your Work
 1. When you are ready to submit your work: do not open a PR. 

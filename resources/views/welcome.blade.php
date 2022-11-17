@@ -38,7 +38,7 @@
                                         <h3>Restrictions and Requirements</h3>
                                         <ol>
                                             <li>This challenge requires Docker to be installed on your system. The easiest way to accomplish this is to <a target="_blank" href="https://www.docker.com/">install Docker Desktop</a>.</li>
-                                            <li>You should focus on code quality and structure. If possible and timely reasonable, also add tests.</li>
+                                            <li>You should focus on code quality and structure.</li>
                                             <li>Wherever possible, try to follow the <a target="_blank" href="https://en.wikipedia.org/wiki/SOLID">SOLID principles</a>.</li>
                                         </ol>
                                     </div>
@@ -73,6 +73,13 @@
                                             <li>Documentation should be updated so Swagger can be generated and used to smoke test.
                                                 <ul>
                                                     <li>We are using the open-source package <a target="_blank" href="https://github.com/DarkaOnLine/L5-Swagger">L5-Swagger</a> to generate OpenAPI Swagger.</li>
+                                                </ul>
+                                            </li>
+                                            <li>Tests
+                                                <ul>
+                                                    <li>Integration and Acceptance tests should be updated to reflect your changes</li>
+                                                    <li>Tests should be added to assert that your changes function as expected</li>
+                                                    <li>Tests should be added to assert that given "bad" cases will fail (assert failures)</li>
                                                 </ul>
                                             </li>
                                         </ol>
