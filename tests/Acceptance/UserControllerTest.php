@@ -28,6 +28,7 @@ class UserControllerTest extends FrameworkTest
                 'id'    => $user->id,
                 'name'  => $user->name,
                 'email' => $user->email,
+                'nickname' => $user->nickname
             ],
             json_decode($result->getContent(), true)
         );
@@ -41,6 +42,7 @@ class UserControllerTest extends FrameworkTest
             'id'    => $user->id,
             'name'  => $this->faker->name,
             'email' => $user->email,
+            'nickname' => $user->nickname
         ];
         $result = $this->put("/api/users/$user->id", $data);
         $result->assertSuccessful();
@@ -59,4 +61,116 @@ class UserControllerTest extends FrameworkTest
         $result->assertSuccessful();
         $this->assertTrue($this->repository->getModel()->newQuery()->where('email', $email)->exists());
     }
+
+    public function testNickNameIsOptionalInParameter()
+    {
+        /**
+         *
+         * Making sure Nick Name is optional as a parameter in store() method.
+         *
+         */
+
+        $data = [
+            'name'  => 'karna soneji',
+            'email' => 'sonejikarna@gmail.com',
+            'password' => 'test password',
+            'nickname' => ''
+        ];
+
+        $result = $this->post("/api/users", $data);
+        $result->assertSuccessful();
+
+        /**
+         *
+         * Making sure Nick Name is optional as a parameter in update() method.
+         *
+         */
+        $user = json_decode($result->getContent());
+
+        $data = [
+            'name'  => 'Swati Dubal',
+            'nickname' => ''
+        ];
+
+        $result = $this->put("/api/users/$user->id", $data);
+        $result->assertSuccessful();
+
+    }
+
+    public function testEmptyRequestBodyInPutMethodFailsValidation()
+    {
+        /**
+         *
+         * We want to test that when request body is empty, the validation fails.
+         *
+         */
+
+        /** @var User $user */
+        $user   = $this->userFactory->create();
+
+        $data = [];
+
+        $result = $this->put("/api/users/$user->id", $data);
+        $result->assertSessionHasErrors(['name','email','password']);
+
+    }
+
+    public function testIntergerValueInNicknameFailsValidation()
+    {
+        /**
+         *
+         * We want to test that when integer value is passed as NickName, the validation fails.
+         *
+         */
+
+        /** @var User $user */
+        $user   = $this->userFactory->create();
+
+        $data = ['nickname' => 12666262];
+
+        $result = $this->put("/api/users/$user->id", $data);
+        $result->assertSessionHasErrors(['nickname']);
+
+    }
+
+    public function testNicknameLengthMoreThanTwentyNineCharactersFailsValidation()
+    {
+        /**
+         *
+         * We want to test that when NickName is more than 29 characters, the validation fails.
+         *
+         */
+
+        /** @var User $user */
+        $user   = $this->userFactory->create();
+
+        $data = ['nickname' => 'lalu soneji lalu soneji lalu lalu soneji lalu soneji lalu '];
+
+        $result = $this->put("/api/users/$user->id", $data);
+
+        $result->assertSessionHasErrors(['nickname']);
+
+    }
+
+    public function testNickNameMustBeUniqueAmongUsers()
+    {
+        /**
+         *
+         *  A valid nickname must be unique among users.
+         *
+         * */
+
+        /** @var User $user */
+        $user = $this->userFactory->create();
+
+        $secondUser = $this->userFactory->create();
+
+        $data = ['nickname' => $user->nickname];
+
+        $result = $this->put("/api/users/$secondUser->id", $data);
+
+        $result->assertSessionHasErrors(['nickname']);
+
+    }
+
 }

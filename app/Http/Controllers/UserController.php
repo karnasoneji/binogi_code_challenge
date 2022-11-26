@@ -10,6 +10,7 @@ use App\Support\Requests\UserUpdateRequest;
 use Exception;
 use Hash;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
 class UserController extends Controller
@@ -40,6 +41,10 @@ class UserController extends Controller
      *         description="User Details",
      *         @OA\JsonContent(ref="#/components/schemas/UserMapper"),
      *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Resource not found",
+     *     )
      * )
      *
      * @param User $user
@@ -84,6 +89,7 @@ class UserController extends Controller
             'name'     => $request->input('name'),
             'email'    => $request->input('email'),
             'password' => Hash::make($request->input('password')),
+            'nickname' => $request->input('nickname'),
         ]);
 
         return \Response::json($this->userMapper->single($user));
@@ -115,6 +121,7 @@ class UserController extends Controller
      *         description="User after the update",
      *         @OA\JsonContent(ref="#/components/schemas/UserMapper"),
      *     ),
+     *     @OA\Response(response=404, description="Resource not found"),
      *     @OA\Response(response=422, description="Failed validation of given params"),
      * )
      *
@@ -125,13 +132,23 @@ class UserController extends Controller
      */
     public function update(UserUpdateRequest $request, User $user): JsonResponse
     {
-        $data = [
-            'name'     => trim($request->input('name')),
-            'email'    => trim($request->input('email')),
-            'password' => Hash::make(trim($request->input('password')) ?: null),
-        ];
 
-        $user->fill($data)->save();
+        /**
+         * "App\Http\Kernel.php" file has the following two global middlewares included and thus we don't need to do "trim()" on the request data.
+         *
+         *          \App\Http\Middleware\TrimStrings::class,
+         *          \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+         *
+         */
+
+        if($request->input('password'))
+        {
+            $input = $request->all();
+            $input['password'] = Hash::make(trim($request->input('password')) ?: null);
+            $user->update($input);
+        }else{
+            $user->update($request->all());
+        }
 
         return \Response::json($this->userMapper->single($user));
     }

@@ -33,6 +33,14 @@ use Illuminate\Validation\Rule;
  *      description="User Password",
  *      example="correct horse battery staple",
  *   ),
+ *   @OA\Property(
+ *      property="nickname",
+ *      type="string",
+ *      minLength=1,
+ *      maxLength=29,
+ *      description="Nick Name",
+ *      example="lalu",
+ *   ),
  * )
  *
  * Get the validation rules that apply to the request.
@@ -49,12 +57,28 @@ class UserUpdateRequest extends FormRequest
 
     public function rules(): array
     {
+        /**
+         * When invalid parameters are passed such as special characters, the request body automatically become empty.
+         *
+         * So technically, it does pass the validation, but that is not correct.
+         *
+         * Thus, to make sure that at-leaat one of the parameters is present in the request body, we have used "required_without_all"
+         *
+         */
+
         return [
-            'name'     => 'string|max:191|min:1',
-            'password' => 'string|min:8|max:191',
+            'name'     => 'required_without_all:password,email,nickname|string|max:191|min:1',
+            'password' => 'required_without_all:name,email,nickname|string|min:8|max:191',
             'email'    => [
                 'email',
                 Rule::unique('users')->ignore(request()->route('user')->id),
+                'required_without_all:name,password,nickname',
+            ],
+            'nickname'    => [
+                'nullable',
+                'string',
+                Rule::unique('users')->ignore(request()->route('user')->id),
+                'max:29'
             ],
         ];
     }
