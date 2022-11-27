@@ -6,6 +6,8 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Response;
 use Throwable;
 use App\Response\Responses;
+use Illuminate\Support\Facades\Response as FacadesResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -48,23 +50,21 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+
+
+        $this->renderable(function (NotFoundHttpException $e, $request) {
+
+            $classPathOfException = get_class($e);
+
+            $response = Responses::getCustomExceptionResponse($classPathOfException);
+
+            if($response)
+            {
+                return FacadesResponse::json($response,Responses::getCustomExceptionResponseStatus($classPathOfException));
+            }
+
+        });
+
     }
 
-    /**
-     * Render an exception into an HTTP response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $e
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
-     */
-    public function render($request, Throwable $e){
-
-        if ($e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException)
-        {
-            return response(json_encode(Responses::$modelNotFound), Responses::$modelNotFoundResponseCode);
-        }
-
-        return parent::render($request, $e);
-    }
 }

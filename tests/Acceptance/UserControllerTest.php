@@ -4,6 +4,7 @@ namespace Tests\Acceptance;
 
 use App\Models\User\User;
 use App\Repositories\UserRepository;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\FrameworkTest;
 
 class UserControllerTest extends FrameworkTest
@@ -171,6 +172,34 @@ class UserControllerTest extends FrameworkTest
 
         $result->assertSessionHasErrors(['nickname']);
 
+    }
+
+    public function testCustomExceptionMessageForAccessingInvalidRecord()
+    {
+        /**
+         *
+         * This test is to validate that when accessing or updating a non-existing record/resource, It returns a customized exception message
+         *
+         */
+
+        $result = $this->getJson("/api/users/1");
+
+        $result->assertJson(fn (AssertableJson $json) =>
+                $json->where('error.message', "Resource not found.")
+        );
+
+        $data = [
+            'name'  => 'karna soneji',
+            'email' => 'sonejikarna@gmail.com',
+            'password' => 'test password',
+            'nickname' => ''
+        ];
+
+        $result = $this->put("/api/users/1", $data);
+
+        $result->assertJson(fn (AssertableJson $json) =>
+                $json->where('error.message', "Resource not found.")
+        );
     }
 
 }
