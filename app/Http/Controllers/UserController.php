@@ -144,7 +144,7 @@ class UserController extends Controller
         if($request->input('password'))
         {
             $input = $request->all();
-            $input['password'] = Hash::make(trim($request->input('password')) ?: null);
+            $input['password'] = Hash::make($request->input('password') ?: null);
             $user->update($input);
         }else{
             $user->update($request->all());
